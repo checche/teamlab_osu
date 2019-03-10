@@ -1,11 +1,18 @@
 <template>
-  <div>
+  <div class="wrapper">
+    <header>
     <p>
       <img class="logo" src="../images/logo.jpg" alt="ロゴ">
-      <span class="sample">サンプルfdf</span>
+      <span class="sample">サンプル</span>
+      <span>ようこそ{{ $data.name }}さん</span>
     </p>
-    <InputForm @submit="onSubmit" />
+    <NameModal @changeName="setName" />
+    </header>
+    <div class="container">
+    <InputFormArea @submit="onSubmit" />
     <TextList :textList="$data.textList" />
+    </div>
+    <footer></footer>
   </div>
 </template>
 
@@ -13,20 +20,22 @@
 import socket from './utils/socket';
 
 // components
-import MyComponent from './components/MyComponent.vue';
 import InputForm from './components/InputForm.vue';
+import InputFormArea from './components/InputFormArea.vue';
 import TextList from './components/TextList.vue';
+import NameModal from './components/NameModal.vue';
 
 export default {
   components: {
-    MyComponent,
-    InputForm,
-    TextList
+    InputForm, // InputForm:InputFormの省略形
+    InputFormArea,
+    TextList,
+    NameModal
   },
   data() {
     const textList = [];
     return {
-      message: '',
+      name: '匿名希望',
       text: '',
       textList: textList.map((item, index) => ({ ...item, id: index })),
       /**
@@ -58,22 +67,35 @@ export default {
      */
     onSubmit(text) {
       const textDetail = {
-        id: this.$data.nextTextId,
-        text: text
+        text: text,
+        name: this.$data.name,
       };
       socket.emit('send', textDetail);
       this.$data.text = '';
     },
+    setName(name) {
+      this.$data.name = name;
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+header {
+  margin: 0 0 10px 0;
+}
+
 .logo {
   width: 40px;
 }
 
 .sample {
   color: $red;
+}
+
+.wrapper {
+  width: 80%;
+  max-width: 960px;
+  margin: 0 auto;
 }
 </style>

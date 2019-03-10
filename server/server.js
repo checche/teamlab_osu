@@ -36,6 +36,7 @@ const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
 // socketサーバーを立ち上げる
 const io = require('socket.io')(server, { origins: '*:*' });
 
+let nextTextId = 0;
 // socketイベントの設定
 io.on('connection', (socket) => {
   console.log('connected:', socket.id);
@@ -47,7 +48,14 @@ io.on('connection', (socket) => {
 
   // ユーザの参加
   socket.on('send', (message) => {
-    console.log('send:', message);
-    io.emit('send', message);
+    const textDetail = {
+      id: nextTextId,
+      text: message.text,
+      name: message.name,
+      date: moment().format('YYYY/MM/DD HH:mm:ss')
+    };
+    nextTextId++;
+    console.log('send:', textDetail);
+    io.emit('send', textDetail);
   });
 });

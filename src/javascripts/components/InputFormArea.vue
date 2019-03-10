@@ -1,7 +1,7 @@
 <template>
 <div>
   <form @submit="onSubmit">
-      <input v-model="$data.text" type="text" placeholder="" />
+      <textarea v-model="$data.text" type="text" placeholder="" />
       <button type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button>
     </form>
 </div>

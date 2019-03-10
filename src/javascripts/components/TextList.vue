@@ -5,7 +5,9 @@
         :key="item.id"
         class="item"
       >
+        <span class="item__name">{{ item.name }}</span>
         <span class="item__text">{{ item.text }}</span>
+        <span class="item__date">{{ item.date }}</span>
       </li>
     </template>
   </transition-group>
@@ -18,7 +20,9 @@ export default {
   props: {
     textList: VueTypes.arrayOf(VueTypes.shape({
       id: VueTypes.number.isRequired,
-      text: VueTypes.string.isRequired
+      text: VueTypes.string.isRequired,
+      name: VueTypes.string.isRequired,
+      date: VueTypes.string.isRequired,
     })).isRequired
   },
   methods: {
@@ -49,9 +53,22 @@ export default {
   box-shadow: 0 0 10px 0 rgba(#000, 0.1);
   cursor: pointer;
 
+  &__name {
+    background-color: #fff;
+    border-radius: 10px;
+    line-height: 30px;
+    padding: 10px;
+    color: #42b983;
+  }
+
   &__text {
     flex: 1 1 0;
     padding: 0 5px;
+    white-space: pre-line;
+  }
+
+  &__date {
+    color: #999;
   }
 }
 
