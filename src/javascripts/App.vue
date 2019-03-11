@@ -1,18 +1,27 @@
 <template>
-  <div class="wrapper">
+  <div>
+
     <header>
-    <p>
+      <div style="float: left;">
       <img class="logo" src="../images/logo.jpg" alt="ロゴ">
-      <span class="sample">サンプル</span>
-      <span>ようこそ{{ $data.name }}さん</span>
-    </p>
-    <NameModal @changeName="setName" />
+      <span class="sample">チャット</span>
+      <span class="welcome">ようこそ{{ $data.name }}さん</span>
+      </div>
+      <NameModal style="float: left;" @changeName="setName" @closeModal="entry"/>
     </header>
-    <div class="container">
-    <InputFormArea @submit="onSubmit" />
-    <TextList :textList="$data.textList" />
+
+    <div class="main">
+      <div class="container">
+        <TextList :textList="$data.textList" />
+      </div>
     </div>
-    <footer></footer>
+
+    <footer>
+      <div class="container">
+        <InputFormArea @submit="onSubmit" />
+      </div>
+    </footer>
+
   </div>
 </template>
 
@@ -35,13 +44,11 @@ export default {
   data() {
     const textList = [];
     return {
+      firstEntry: true,
+      preName: '',
       name: '匿名希望',
       text: '',
       textList: textList.map((item, index) => ({ ...item, id: index })),
-      /**
-       * 次のtextに降るID番号
-       */
-      nextTextId: textList.length
     };
   },
   created() {
@@ -51,13 +58,11 @@ export default {
 
     /**
      * 受け取ったtextDetailをもとにtextListを更新
-     * その後nextTextIdをインクリメント
-     * @param {object} textDetail - idとtextが格納されてる
+     * @param {object} textDetail - id,text,date,nameが格納されてる
      */
-    socket.on('send', (textDetail) => {
+    socket.on('sendToC', (textDetail) => {
       console.log(textDetail);
-      this.$data.textList.unshift(textDetail);
-      this.$data.nextTextId += 1;
+      this.$data.textList.push(textDetail);
     });
   },
   methods: {
@@ -70,19 +75,53 @@ export default {
         text: text,
         name: this.$data.name,
       };
-      socket.emit('send', textDetail);
+      socket.emit('sendToS', textDetail);
       this.$data.text = '';
     },
+    /**
+     * 名前を登録したとき
+     * @param {string} name - 新しい名前
+     */
     setName(name) {
-      this.$data.name = name;
-    }
+      // 初なら入室と表示
+      if (this.$data.firstEntry === true) {
+        this.$data.preName = this.$data.name;
+        this.$data.name = name;
+        socket.emit('entry', this.$data.name);
+        this.$data.firstEntry = false;
+      } else if (this.$data.name !== name) { // 2回め以降は改名と表示.同じ名前には変更できない.
+        this.$data.preName = this.$data.name;
+        this.$data.name = name;
+        socket.emit('rename', this.$data.name, this.$data.preName);
+      };
+    },
+    /**
+     * モーダルを閉じたとき
+     */
+    entry() {
+      // 初なら匿名希望として入室,二回目以降は何もしない
+      if (this.$data.firstEntry === true) {
+        socket.emit('entry', this.$data.name);
+        this.$data.firstEntry = false;
+      };
+    },
   }
 };
 </script>
 
 <style lang="scss" scoped>
 header {
-  margin: 0 0 10px 0;
+  z-index: 100;
+  top: 0;
+  position: fixed;
+  background-color: #2c3e50;
+  width: 100%;
+  height: 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+}
+
+.welcome {
+  color: #fff;
 }
 
 .logo {
@@ -90,12 +129,25 @@ header {
 }
 
 .sample {
-  color: $red;
+  color: #42b983;
 }
 
-.wrapper {
+.container {
   width: 80%;
   max-width: 960px;
   margin: 0 auto;
+}
+
+.main {
+  margin: 50px 0 100px 0;
+}
+
+footer {
+  background-color: #2c3e50;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
 <div>
   <form @submit="onSubmit">
-      <textarea v-model="$data.text" type="text" placeholder="" />
-      <button type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button>
-    </form>
+    <textarea v-model="$data.text" type="text" placeholder="" />
+    <button class="btn" type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button>
+  </form>
 </div>
 </template>
 
@@ -29,6 +29,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-//
+.btn {
+  height: 30px;
+  border-radius: 5px;
+}
+
+textarea {
+  padding: 10px;
+  width: 85%;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33) inset;
+}
+
 </style>
 

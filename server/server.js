@@ -36,6 +36,9 @@ const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
 // socketサーバーを立ち上げる
 const io = require('socket.io')(server, { origins: '*:*' });
 
+/**
+ * @param {number} - 次のテキストに付けるID
+ */
 let nextTextId = 0;
 // socketイベントの設定
 io.on('connection', (socket) => {
@@ -46,8 +49,8 @@ io.on('connection', (socket) => {
     console.log('disconnected:', socket.id);
   });
 
-  // ユーザの参加
-  socket.on('send', (message) => {
+  // ユーザの送信内容処理
+  socket.on('sendToS', (message) => {
     const textDetail = {
       id: nextTextId,
       text: message.text,
@@ -55,7 +58,39 @@ io.on('connection', (socket) => {
       date: moment().format('YYYY/MM/DD HH:mm:ss')
     };
     nextTextId++;
-    console.log('send:', textDetail);
-    io.emit('send', textDetail);
+    console.log('sendToC:', textDetail);
+    io.emit('sendToC', textDetail);
+  });
+
+  /**
+   * 入室処理
+   */
+  socket.on('entry', (entryName) => {
+    const textDetail = {
+      id: nextTextId,
+      text: '',
+      name: 'System',
+      date: moment().format('YYYY/MM/DD HH:mm:ss')
+    };
+    textDetail['text'] = `${entryName}が入室しました.`;
+    nextTextId++;
+    console.log('sendToC:', textDetail);
+    socket.broadcast.emit('sendToC', textDetail);
+  });
+  /**
+   * 名前変更
+   */
+  socket.on('rename', (entryName, preName) => {
+    const textDetail = {
+      id: nextTextId,
+      text: '',
+      name: 'System',
+      date: moment().format('YYYY/MM/DD HH:mm:ss')
+    };
+    textDetail['text'] = `${preName}が${entryName}に改名しました.`;
+    nextTextId++;
+    console.log('sendToC:', textDetail);
+    io.emit('sendToC', textDetail);
+    // socket.broadcast.emit('sendToC', textDetail);
   });
 });

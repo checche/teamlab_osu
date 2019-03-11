@@ -20,7 +20,7 @@
             <slot name="footer">
               default footer
             </slot>
-            <button class="modal-default-button" @click="onClick">
+            <button class="btn modal-default-button" @click="onClick">
               閉じる
             </button>
           </div>
@@ -41,6 +41,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.btn {
+  height: 30px;
+  border-radius: 5px;
+}
+
 .modal {
   &-mask {
     position: fixed;

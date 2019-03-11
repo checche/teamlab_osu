@@ -82,7 +82,7 @@ export default {
   &-enter {
     &-active {
       opacity: 0;
-      transform: translate3d(0, -30px, 0);
+      transform: translate3d(0, 30px, 0);
     }
 
     &-to {
