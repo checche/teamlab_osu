@@ -40,6 +40,11 @@ const io = require('socket.io')(server, { origins: '*:*' });
  * @param {number} - 次のテキストに付けるID
  */
 let nextTextId = 0;
+/**
+ * @param {object} - ID:名前として格納する
+ */
+const userList = {};
+
 // socketイベントの設定
 io.on('connection', (socket) => {
   console.log('connected:', socket.id);
@@ -47,6 +52,7 @@ io.on('connection', (socket) => {
   // 切断時
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
+    removeUserList(socket.id);
   });
 
   // ユーザの送信内容処理
@@ -63,34 +69,68 @@ io.on('connection', (socket) => {
   });
 
   /**
-   * 入室処理
+   * 入室処理,入室されたユーザーへのコメント
+   * ユーザーオブジェクトにIDと名前を格納
    */
   socket.on('entry', (entryName) => {
-    const textDetail = {
-      id: nextTextId,
-      text: '',
-      name: 'System',
-      date: moment().format('YYYY/MM/DD HH:mm:ss')
-    };
-    textDetail['text'] = `${entryName}が入室しました.`;
-    nextTextId++;
-    console.log('sendToC:', textDetail);
+    const text = `${entryName}が入室しました.`;
+    const textDetail = systemComment(text);
+    addUserList(socket.id, entryName);
     socket.broadcast.emit('sendToC', textDetail);
+  });
+  /**
+   * 入室したユーザーへのコメント
+   */
+  socket.on('entryMessageToYou', (entryName) => {
+    const text = `ようこそ${entryName}さん.
+まずはみんなにご挨拶しましょう.`;
+    const textDetail = systemComment(text);
+    const userId = socket.id;
+    io.to(userId).emit('sendToC', textDetail);
   });
   /**
    * 名前変更
    */
   socket.on('rename', (entryName, preName) => {
+    const text = `${preName}が${entryName}に改名しました.`;
+    const textDetail = systemComment(text);
+    addUserList(socket.id, entryName);
+    io.emit('sendToC', textDetail);
+  });
+
+  /**
+   * システムが指定したtextDetailを返す.
+   * @param {string} texFromSys - システムのコメント内容
+   */
+  const systemComment = (texFromSys) => {
     const textDetail = {
       id: nextTextId,
-      text: '',
+      text: texFromSys,
       name: 'System',
       date: moment().format('YYYY/MM/DD HH:mm:ss')
     };
-    textDetail['text'] = `${preName}が${entryName}に改名しました.`;
     nextTextId++;
-    console.log('sendToC:', textDetail);
-    io.emit('sendToC', textDetail);
-    // socket.broadcast.emit('sendToC', textDetail);
-  });
+    console.log('System:', textDetail);
+    return textDetail;
+  };
+
+  /**
+   * ユーザーリストを登録,変更する.
+   * @param {string} id - ユーザーID
+   * @param {string} name - 名前
+   */
+  const addUserList = (id, name) => {
+    userList[id] = name;
+    console.log('userlist:', userList);
+    io.emit('sendUL', userList);
+  };
+  /**
+   * ユーザーリストを削除する.
+   * @param {string} id - ユーザーID
+   */
+  const removeUserList = (id) => {
+    delete userList[id];
+    console.log('userlist:', userList);
+    io.emit('sendUL', userList);
+  };
 });

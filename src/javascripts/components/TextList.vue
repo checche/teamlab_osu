@@ -65,6 +65,7 @@ export default {
     flex: 1 1 0;
     padding: 0 5px;
     white-space: pre-line;
+    color: #2c3e50;
   }
 
   &__date {

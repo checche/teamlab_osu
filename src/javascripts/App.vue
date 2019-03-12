@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <header>
       <div style="float: left;">
       <img class="logo" src="../images/logo.jpg" alt="ロゴ">
@@ -9,9 +8,11 @@
       </div>
       <NameModal style="float: left;" @changeName="setName" @closeModal="entry"/>
     </header>
-
     <div class="main">
       <div class="container">
+      <template v-for="user in $data.userList">
+        <li class="userlist">{{ user }}</li>
+      </template>
         <TextList :textList="$data.textList" />
       </div>
     </div>
@@ -49,6 +50,7 @@ export default {
       name: '匿名希望',
       text: '',
       textList: textList.map((item, index) => ({ ...item, id: index })),
+      userList: {},
     };
   },
   created() {
@@ -63,6 +65,11 @@ export default {
     socket.on('sendToC', (textDetail) => {
       console.log(textDetail);
       this.$data.textList.push(textDetail);
+    });
+
+    socket.on('sendUL', (ul) => {
+      console.log(ul);
+      this.$data.userList = ul;
     });
   },
   methods: {
@@ -88,6 +95,7 @@ export default {
         this.$data.preName = this.$data.name;
         this.$data.name = name;
         socket.emit('entry', this.$data.name);
+        socket.emit('entryMessageToYou', this.$data.name);
         this.$data.firstEntry = false;
       } else if (this.$data.name !== name) { // 2回め以降は改名と表示.同じ名前には変更できない.
         this.$data.preName = this.$data.name;
@@ -114,10 +122,14 @@ header {
   z-index: 100;
   top: 0;
   position: fixed;
-  background-color: #2c3e50;
+  background-color: #42b983;
   width: 100%;
   height: 50px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+}
+
+.userlist {
+  color: #2c3e50;
 }
 
 .welcome {
@@ -129,7 +141,7 @@ header {
 }
 
 .sample {
-  color: #42b983;
+  color: #2c3e50;
 }
 
 .container {
@@ -143,7 +155,7 @@ header {
 }
 
 footer {
-  background-color: #2c3e50;
+  background-color: #42b983;
   position: fixed;
   bottom: 0;
   width: 100%;
