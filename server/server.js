@@ -52,7 +52,13 @@ io.on('connection', (socket) => {
   // 切断時
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
-    const text = `${userList[socket.id]}が退室しました.`;
+    const name = userList[socket.id];
+    let text;
+    if (name === undefined) {
+      text = `だれかがが覗いて帰りました.`;
+    } else {
+      text = `${userList[socket.id]}が退室しました.`;
+    }
     io.emit('sendToC', systemComment(text));
     removeUserList(socket.id);
   });
