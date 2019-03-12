@@ -52,6 +52,8 @@ io.on('connection', (socket) => {
   // 切断時
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
+    const text = `${userList[socket.id]}が退室しました.`;
+    io.emit('sendToC', systemComment(text));
     removeUserList(socket.id);
   });
 
