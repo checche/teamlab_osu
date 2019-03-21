@@ -6,8 +6,9 @@
       <li><a class="welcome">ようこそ{{ $props.name }}さん</a></li>
       <li><NameModal @closeModal="_entry" @changeName="_setName"/></li>
       <li><UserDropdown :userList="$props.userList"/></li>
+      <li><input placeholder="検索" class="searchbox" type="text" :value="$props.value" @input="$emit('input', $event.target.value)"></li>
     </ul>
-    <input type="text" :value="$props.value" @input="$emit('input', $event.target.value)">
+
     </header>
 </template>
 
@@ -45,7 +46,7 @@ header {
   position: fixed;
   background-color: #42b983;
   width: 100%;
-  height: 50px;
+  height: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 
   ul {
@@ -63,6 +64,12 @@ header {
     height: 50px;
     margin: 0;
     float: left;
+  }
+
+  input {
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.33) inset;
   }
 }
 </style>

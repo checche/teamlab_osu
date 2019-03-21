@@ -2,7 +2,7 @@
 <div>
   <form @submit="onSubmit">
     <textarea v-model="$data.text" type="text" placeholder="" @input="$emit('input', $event.target.value)"/>
-    <button class="btn" type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button>
+    <div class="btnarea"><button class="btn" type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button></div>
   </form>
 </div>
 </template>
@@ -34,15 +34,37 @@ export default {
 
 <style lang="scss" scoped>
 .btn {
-  height: 30px;
+  height: 100%;
+  width: 100%;
   border-radius: 5px;
+  color: #2c3e50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+}
+
+:disabled {
+  color: #2c3e50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33) inset;
+}
+
+.btnarea {
+  height: 100px;
+  max-width: 192px;
+  width: 20%;
+  box-sizing: border-box;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 textarea {
   padding: 10px;
-  width: 85%;
+  height: 100px;
+  max-width: 768px;
+  width: 80%;
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33) inset;
+  float: left;
+  box-sizing: border-box;
+  color: #2c3e50;
 }
 
 </style>

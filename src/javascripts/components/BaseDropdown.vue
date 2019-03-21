@@ -23,16 +23,16 @@ export default {
 .dd {
   &-mask {
     position: fixed;
-    z-index: 9998;
+    z-index: 999;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     display: table;
-    transition: opacity 0.3s ease;
   }
 
   &-container {
+    z-index: 9999;
     position: absolute;
     width: 200px;
     padding: 20px 30px;
@@ -52,7 +52,8 @@ export default {
     opacity: 0;
   }
 
-  &-enter,&-leave-active {
+  &-enter &-container,
+  &-leave-active &-container {
     transform: scale(1.1);
   }
 }

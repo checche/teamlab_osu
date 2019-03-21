@@ -84,6 +84,10 @@ export default {
     margin: 20px 0;
   }
 
+  &-footer {
+    color: #333;
+  }
+
   &-default-button {
     float: right;
   }

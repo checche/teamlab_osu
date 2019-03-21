@@ -1,10 +1,10 @@
 <template>
   <transition-group tag="ul" class="list" name="flip">
-    {{ $props.searchText }}
     <template v-for="item in filteredTexts">
       <li
         :key="item.id"
         class="item"
+        :id="item.id"
       >
         <span class="item__name">{{ item.name }}</span>
         <span class="item__text">{{ item.text }}</span>
@@ -30,7 +30,8 @@ export default {
   computed: {
     filteredTexts() {
       return this.$props.textList.filter((item) => {
-        return item.text.indexOf(this.$props.searchText) !== -1;
+        const searchRegex = new RegExp(this.$props.searchText, 'i');
+        return (searchRegex.test(item.name) || searchRegex.test(item.text));
       });
     }
   },
@@ -76,6 +77,7 @@ export default {
 
   &__date {
     color: #999;
+    font-size: 10px;
   }
 }
 
@@ -106,7 +108,7 @@ export default {
 
     &-to {
       opacity: 0;
-      transform: translate3d(0, -30px, 0);
+      transform: translate3d(0, 30px, 0);
     }
   }
 }

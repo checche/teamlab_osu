@@ -5,6 +5,7 @@
       <div class="container">
         <TextList :textList="$data.textList" :searchText="$data.searchText"/>
       </div>
+      <div id="textBottom"></div>
     </div>
     <footer>
       <div class="container">
@@ -56,6 +57,10 @@ export default {
     socket.on('sendToC', (textDetail) => {
       console.log(textDetail);
       this.$data.textList.push(textDetail);
+      const element = document.getElementById('textBottom'); // 移動させたい位置の要素を取得
+      const rect = element.getBoundingClientRect();
+      const position = rect.bottom;    // 一番上からの位置を取得
+      setTimeout(() => scrollTo(0, position), 0);
     });
 
     socket.on('sendUL', (ul) => {
