@@ -1,6 +1,6 @@
 <template>
 <div>
-  <button class="btn" id="show-modal" @click="showModal = true">名前を変更する</button>
+  <li class="btn" id="show-modal" @click="showModal = true">名前を変更する</li>
   <BaseModal v-if="showModal" @close="closeModal">
     <h3 slot="header">ユーザー名を入力してください.</h3>
     <InputForm slot="body" @submit="onSubmit">
@@ -45,15 +45,9 @@ export default {
 </script>
 
 <style lang=scss scoped>
-div {
-  height: 50px;
-  display: table-cell;
+li {
+  display: inline-block;
+  cursor: pointer;
 }
-
-.btn {
-  height: 30px;
-  border-radius: 5px;
-}
-
 </style>
 

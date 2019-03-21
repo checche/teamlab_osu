@@ -1,6 +1,7 @@
 <template>
   <transition-group tag="ul" class="list" name="flip">
-    <template v-for="item in $props.textList">
+    {{ $props.searchText }}
+    <template v-for="item in filteredTexts">
       <li
         :key="item.id"
         class="item"
@@ -23,10 +24,16 @@ export default {
       text: VueTypes.string.isRequired,
       name: VueTypes.string.isRequired,
       date: VueTypes.string.isRequired,
-    })).isRequired
+    })).isRequired,
+    searchText: VueTypes.string,
   },
-  methods: {
-  }
+  computed: {
+    filteredTexts() {
+      return this.$props.textList.filter((item) => {
+        return item.text.indexOf(this.$props.searchText) !== -1;
+      });
+    }
+  },
 };
 </script>
 
@@ -51,7 +58,6 @@ export default {
   border: solid 1px #ddd;
   border-radius: 5px;
   box-shadow: 0 0 10px 0 rgba(#000, 0.1);
-  cursor: pointer;
 
   &__name {
     background-color: #fff;

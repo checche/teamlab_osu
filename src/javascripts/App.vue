@@ -1,25 +1,14 @@
 <template>
   <div>
-    <header>
-      <div style="float: left;">
-      <img class="logo" src="../images/logo.jpg" alt="ロゴ">
-      <span class="sample">チャット</span>
-      <span class="welcome">ようこそ{{ $data.name }}さん</span>
-      </div>
-      <NameModal style="float: left;" @changeName="setName" @closeModal="entry"/>
-    </header>
+    <MyHeader :name="$data.name" :userList="$data.userList" @cName="setName" @cModal="entry" v-model="$data.searchText"/>
     <div class="main">
       <div class="container">
-      <template v-for="user in $data.userList">
-        <li class="userlist">{{ user }}</li>
-      </template>
-        <TextList :textList="$data.textList" />
+        <TextList :textList="$data.textList" :searchText="$data.searchText"/>
       </div>
     </div>
-
     <footer>
       <div class="container">
-        <InputFormArea @submit="onSubmit" />
+        <InputFormArea @submit="onSubmit" v-model="$data.inputtext" />
       </div>
     </footer>
 
@@ -33,24 +22,26 @@ import socket from './utils/socket';
 import InputForm from './components/InputForm.vue';
 import InputFormArea from './components/InputFormArea.vue';
 import TextList from './components/TextList.vue';
-import NameModal from './components/NameModal.vue';
+import MyHeader from './components/MyHeader.vue';
 
 export default {
   components: {
     InputForm, // InputForm:InputFormの省略形
     InputFormArea,
     TextList,
-    NameModal
+    MyHeader,
   },
   data() {
     const textList = [];
     return {
+      inputtext: '',
       firstEntry: true,
       preName: '',
       name: '匿名希望',
       text: '',
       textList: textList.map((item, index) => ({ ...item, id: index })),
       userList: {},
+      searchText: '',
     };
   },
   created() {
@@ -91,6 +82,7 @@ export default {
      */
     setName(name) {
       // 初なら入室と表示
+      console.log(name);
       if (this.$data.firstEntry === true) {
         this.$data.preName = this.$data.name;
         this.$data.name = name;
@@ -110,6 +102,7 @@ export default {
       // 初なら匿名希望として入室,二回目以降は何もしない
       if (this.$data.firstEntry === true) {
         socket.emit('entry', this.$data.name);
+        socket.emit('entryMessageToYou', this.$data.name);
         this.$data.firstEntry = false;
       };
     },
@@ -118,16 +111,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-header {
-  z-index: 100;
-  top: 0;
-  position: fixed;
-  background-color: #42b983;
-  width: 100%;
-  height: 50px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-}
-
 .userlist {
   color: #2c3e50;
 }

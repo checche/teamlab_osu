@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
       id: nextTextId,
       text: message.text,
       name: message.name,
-      date: moment().format('YYYY/MM/DD HH:mm:ss')
+      date: moment().format('YYYY/MM/DD HH:mm:ss'),
     };
     nextTextId++;
     console.log('sendToC:', textDetail);
@@ -115,7 +115,7 @@ io.on('connection', (socket) => {
       id: nextTextId,
       text: texFromSys,
       name: 'System',
-      date: moment().format('YYYY/MM/DD HH:mm:ss')
+      date: moment().format('YYYY/MM/DD HH:mm:ss'),
     };
     nextTextId++;
     console.log('System:', textDetail);
