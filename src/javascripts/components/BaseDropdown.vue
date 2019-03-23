@@ -1,12 +1,12 @@
 <template>
-  <div>
     <transition name="dd">
-      <div class="dd-container">
-        <slot name="text">内容</slot>
+      <div>
+        <div class="dd-container">
+          <slot name="text">内容</slot>
+        </div>
+        <div class="dd-mask" @click="onClick"></div>
       </div>
-    </transition>
-    <div class="dd-mask" @click="onClick"></div>
-  </div>
+   </transition>
 </template>
 
 <script>
@@ -44,17 +44,9 @@ export default {
     color: #fff;
   }
 
-  &-enter {
+  &-enter &-container {
+    transform: translate3d(-20px, -20px, 0);
     opacity: 0;
-  }
-
-  &-leave-active {
-    opacity: 0;
-  }
-
-  &-enter &-container,
-  &-leave-active &-container {
-    transform: scale(1.1);
   }
 }
 </style>

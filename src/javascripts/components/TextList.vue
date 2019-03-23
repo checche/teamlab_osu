@@ -61,11 +61,10 @@ export default {
   box-shadow: 0 0 10px 0 rgba(#000, 0.1);
 
   &__name {
-    background-color: #fff;
-    border-radius: 10px;
-    line-height: 30px;
     padding: 10px;
     color: #42b983;
+    width: 20%;
+    word-wrap: break-word;
   }
 
   &__text {
@@ -73,11 +72,15 @@ export default {
     padding: 0 5px;
     white-space: pre-line;
     color: #2c3e50;
+    width: 70%;
+    word-wrap: break-word;
   }
 
   &__date {
     color: #999;
     font-size: 10px;
+    width: 10%;
+    word-wrap: break-word;
   }
 }
 
