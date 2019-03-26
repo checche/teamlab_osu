@@ -15,7 +15,7 @@
         </select>
       </li>
       <li><input placeholder="検索" class="searchbox" type="text" :value="$props.searchWord" @input="$emit('input', $event.target.value)"></li>
-      <li class="btn"><span @click="$emit('getwiki')">話題をwikipediaから探す</span></li>
+      <li class="btn" @click="$emit('getwiki')">話題をwikipediaから探す</li>
       <li>{{ $props.theme }}</li>
     </ul>
 
