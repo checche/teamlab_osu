@@ -1,6 +1,16 @@
 <template>
   <div>
-    <MyHeader :name="$data.name" :userList="$data.userList" @cName="setName" @cModal="entry" v-model="$data.searchText"/>
+    <MyHeader
+      :name="$data.name"
+      :userList="$data.userList"
+      :theme="$data.theme"
+      @cRoom="changeRoom"
+      @cName="setName"
+      @cModal="entry"
+      @input="inputSearchText"
+      @getwiki="getwiki"
+    />
+
     <div class="main">
       <div class="container">
         <TextList :textList="$data.textList" :searchText="$data.searchText"/>
@@ -9,7 +19,7 @@
     </div>
     <footer>
       <div class="container">
-        <InputFormArea @submit="onSubmit" v-model="$data.inputtext" />
+        <InputFormArea @submit="onSubmit" />
       </div>
     </footer>
 
@@ -35,7 +45,6 @@ export default {
   data() {
     const textList = [];
     return {
-      inputtext: '',
       firstEntry: true,
       preName: '',
       name: '匿名希望',
@@ -43,6 +52,8 @@ export default {
       textList: textList.map((item, index) => ({ ...item, id: index })),
       userList: {},
       searchText: '',
+      roomName: '',
+      theme: ''
     };
   },
   created() {
@@ -67,8 +78,24 @@ export default {
       console.log(ul);
       this.$data.userList = ul;
     });
+    socket.on('sendThemeToC', (theme) => {
+      this.$data.theme = theme;
+    });
   },
   methods: {
+    getwiki() {
+      socket.emit('getWiki');
+    },
+    inputSearchText(word) {
+      this.$data.searchText = word;
+    },
+    booledit(text) {
+      if (text === '') {
+        this.$data.editting = false;
+      } else if (text !== '') {
+        this.$data.editting = true;
+      }
+    },
     /**
      * InputFormから受け取ったtextをもとにtextDetailをソケットに送信
      * @param {string} text - 文
@@ -78,7 +105,7 @@ export default {
         text: text,
         name: this.$data.name,
       };
-      socket.emit('sendToS', textDetail);
+      socket.emit('sendToS', textDetail, this.$data.roomName);
       this.$data.text = '';
     },
     /**
@@ -87,7 +114,6 @@ export default {
      */
     setName(name) {
       // 初なら入室と表示
-      console.log(name);
       if (this.$data.firstEntry === true) {
         this.$data.preName = this.$data.name;
         this.$data.name = name;
@@ -110,6 +136,10 @@ export default {
         socket.emit('entryMessageToYou', this.$data.name);
         this.$data.firstEntry = false;
       };
+    },
+    changeRoom(room) {
+      this.$data.roomName = room;
+      socket.emit('changeRoom', this.$data.roomName);
     },
   }
 };

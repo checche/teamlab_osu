@@ -1,18 +1,14 @@
 <template>
 <div>
   <form @submit="onSubmit">
-    <textarea v-model="$data.text" type="text" placeholder="" @input="$emit('input', $event.target.value)"/>
+    <textarea v-model="$data.text" type="text" placeholder=""/>
     <div class="btnarea"><button class="btn" type="submit" :disabled="$data.text === ''"><slot name="bname">送信</slot></button></div>
   </form>
 </div>
 </template>
 
 <script>
-import VueTypes from 'vue-types';
 export default {
-  props: {
-    value: VueTypes.string.isRequired,
-  },
   data() {
     return {
       text: ''
@@ -39,10 +35,12 @@ export default {
   border-radius: 5px;
   color: #2c3e50;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  background-color: #fff;
 }
 
 :disabled {
   color: #2c3e50;
+  background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33) inset;
 }
 

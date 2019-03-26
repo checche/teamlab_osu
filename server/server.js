@@ -36,6 +36,10 @@ const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
 // socketサーバーを立ち上げる
 const io = require('socket.io')(server, { origins: '*:*' });
 
+const axios = require('axios');
+
+const WIKI_URL = 'http://ja.wikipedia.org/w/api.php?format=json&action=query&list=random&rnnamespace=0&rnlimit=1';
+
 /**
  * @param {number} - 次のテキストに付けるID
  */
@@ -44,11 +48,17 @@ let nextTextId = 0;
  * @param {object} - ID:名前として格納する
  */
 const userList = {};
+/**
+ * @param {string} - 現在のトークテーマ
+ */
+let theme = '';
 
 // socketイベントの設定
 io.on('connection', (socket) => {
   console.log('connected:', socket.id);
-
+  // ここで定義した変数はクライアントごとに異なる値を持つことができる.
+  let roomName = '';
+  let userName = '匿名希望';
   // 切断時
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
@@ -64,7 +74,7 @@ io.on('connection', (socket) => {
   });
 
   // ユーザの送信内容処理
-  socket.on('sendToS', (message) => {
+  socket.on('sendToS', (message, roomName) => {
     const textDetail = {
       id: nextTextId,
       text: message.text,
@@ -73,7 +83,8 @@ io.on('connection', (socket) => {
     };
     nextTextId++;
     console.log('sendToC:', textDetail);
-    io.emit('sendToC', textDetail);
+    console.log(roomName);
+    io.to(roomName).emit('sendToC', textDetail);
   });
 
   /**
@@ -81,7 +92,8 @@ io.on('connection', (socket) => {
    * ユーザーオブジェクトにIDと名前を格納
    */
   socket.on('entry', (entryName) => {
-    const text = `${entryName}が入室しました.`;
+    const text = `${entryName}が参加しました.`;
+    userName = entryName;
     const textDetail = systemComment(text);
     addUserList(socket.id, entryName);
     socket.broadcast.emit('sendToC', textDetail);
@@ -91,9 +103,10 @@ io.on('connection', (socket) => {
    */
   socket.on('entryMessageToYou', (entryName) => {
     const text = `ようこそ${entryName}さん.
-まずはみんなにご挨拶しましょう.`;
+まずは部屋を選びましょう.`;
     const textDetail = systemComment(text);
     const userId = socket.id;
+    io.to(userId).emit('sendThemeToC', theme);
     io.to(userId).emit('sendToC', textDetail);
   });
   /**
@@ -101,11 +114,60 @@ io.on('connection', (socket) => {
    */
   socket.on('rename', (entryName, preName) => {
     const text = `${preName}が${entryName}に改名しました.`;
+    userName = entryName;
     const textDetail = systemComment(text);
     addUserList(socket.id, entryName);
     io.emit('sendToC', textDetail);
+    console.log(roomName);
   });
 
+  socket.on('changeRoom', (room) => {
+    // 退室
+    socket.leave(roomName);
+    const leaveText = `${userName}が${roomName}ルームを退室しました.`;
+    const leaveTextDetail = systemComment(leaveText);
+    io.to(roomName).emit('sendToC', leaveTextDetail);
+    // 入室
+    socket.join(room);
+    console.log('changeRoom', `${socket.id} changes ${room} from ${roomName}`);
+    const joinText = `${userName}が${room}ルームに入室してきました.`;
+    const joinTextDetail = systemComment(joinText);
+    socket.broadcast.to(room).emit('sendToC', joinTextDetail);
+    // 部屋名変更
+    roomName = room;
+  });
+  /**
+   * トークテーマを変える.API叩く.
+   */
+  socket.on('getWiki', () => {
+    axios.get(WIKI_URL)
+      .then(response => {
+        theme = response.data.query.random[0].title;
+        io.emit('sendThemeToC', theme);
+      })
+      .catch(function(error) {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
+      });
+  });
+
+  const apiError = (error) => {
+
+  };
   /**
    * システムが指定したtextDetailを返す.
    * @param {string} texFromSys - システムのコメント内容
