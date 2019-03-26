@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="bg__mask"><div class="bg__wrapper"><div class="bg__container">{{ $data.roomName }}</div></div></div>
     <MyHeader
       :name="$data.name"
       :userList="$data.userList"
@@ -146,6 +147,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.bg {
+  &__mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: table;
+  }
+
+  &__wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  &__container {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px 30px;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 30vw;
+    text-align: center;
+    color: #42b98323;
+  }
+}
+
 .userlist {
   color: #2c3e50;
 }
