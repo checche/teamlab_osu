@@ -52,6 +52,10 @@ const userList = {};
  * @param {string} - 現在のトークテーマ
  */
 let theme = '';
+/**
+ * 部屋名リスト
+ */
+const roomList = ['A', 'B', 'C'];
 
 // socketイベントの設定
 io.on('connection', (socket) => {
@@ -67,7 +71,7 @@ io.on('connection', (socket) => {
     if (name === undefined) {
       text = `だれかがが覗いて帰りました.`;
     } else {
-      text = `${userList[socket.id]}が退室しました.`;
+      text = `${userList[socket.id].name}が退室しました.`;
     }
     io.emit('sendToC', systemComment(text));
     removeUserList(socket.id);
@@ -95,7 +99,10 @@ io.on('connection', (socket) => {
     const text = `${entryName}が参加しました.`;
     userName = entryName;
     const textDetail = systemComment(text);
-    addUserList(socket.id, entryName);
+    roomName = roomList[Math.floor(Math.random() * roomList.length)];
+    addUserList(socket.id, entryName, roomName);
+    socket.join(roomName);
+    io.to(socket.id).emit('sendRoomName', roomName);
     socket.broadcast.emit('sendToC', textDetail);
   });
   /**
@@ -103,7 +110,7 @@ io.on('connection', (socket) => {
    */
   socket.on('entryMessageToYou', (entryName) => {
     const text = `ようこそ${entryName}さん.
-まずは部屋を選びましょう.`;
+現在は部屋${roomName}にいます.`;
     const textDetail = systemComment(text);
     const userId = socket.id;
     io.to(userId).emit('sendThemeToC', theme);
@@ -116,7 +123,7 @@ io.on('connection', (socket) => {
     const text = `${preName}が${entryName}に改名しました.`;
     userName = entryName;
     const textDetail = systemComment(text);
-    addUserList(socket.id, entryName);
+    addUserList(socket.id, entryName, roomName);
     io.emit('sendToC', textDetail);
     console.log(roomName);
   });
@@ -165,9 +172,6 @@ io.on('connection', (socket) => {
       });
   });
 
-  const apiError = (error) => {
-
-  };
   /**
    * システムが指定したtextDetailを返す.
    * @param {string} texFromSys - システムのコメント内容
@@ -189,8 +193,8 @@ io.on('connection', (socket) => {
    * @param {string} id - ユーザーID
    * @param {string} name - 名前
    */
-  const addUserList = (id, name) => {
-    userList[id] = name;
+  const addUserList = (id, name, room) => {
+    userList[id] = { 'name': name, 'room': room };
     console.log('userlist:', userList);
     io.emit('sendUL', userList);
   };

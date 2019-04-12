@@ -5,9 +5,9 @@
       :name="$data.name"
       :userList="$data.userList"
       :theme="$data.theme"
-      @cRoom="changeRoom"
-      @cName="setName"
-      @cModal="entry"
+      @changeRoom="changeRoom"
+      @changeName="setName"
+      @closeModal="entry"
       @input="inputSearchText"
       @getwiki="getwiki"
     />
@@ -81,6 +81,9 @@ export default {
     });
     socket.on('sendThemeToC', (theme) => {
       this.$data.theme = theme;
+    });
+    socket.on('sendRoomName', (room) => {
+      this.$data.roomName = room;
     });
   },
   methods: {

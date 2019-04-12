@@ -3,7 +3,7 @@
   <li class="btn" id="show-dropdown" @click="showDropdown = true">参加者リスト</li>
   <BaseDropdown v-if="showDropdown" @close="closeDropdown">
       <template slot="text" v-for="user in $props.userList">
-        <li class="name">{{ user }}</li>
+        <li class="name">{{ user.name }}: {{ user.room }}</li>
       </template>
   </BaseDropdown>
   </div>

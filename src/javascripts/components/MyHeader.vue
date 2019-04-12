@@ -7,7 +7,7 @@
       <li class="btn"><NameModal @closeModal="_entry" @changeName="_setName"/></li>
       <li class="btn"><UserDropdown :userList="$props.userList"/></li>
       <li>
-        <select :value="$props.searchWord" @change="$emit('cRoom', $event.target.value)">
+        <select :value="$props.searchWord" @change="$emit('changeRoom', $event.target.value)">
           <option disabled value="">部屋名</option>
           <option>A</option>
           <option>B</option>
@@ -41,10 +41,10 @@ export default {
   },
   methods: {
     _entry() {
-      this.$emit('cModal');
+      this.$emit('closeModal');
     },
     _setName(name) {
-      this.$emit('cName', name);
+      this.$emit('changeName', name);
     }
   }
 };
