@@ -142,6 +142,7 @@ io.on('connection', (socket) => {
     socket.broadcast.to(room).emit('sendToC', joinTextDetail);
     // 部屋名変更
     roomName = room;
+    addUserList(socket.id, userName, roomName);
   });
   /**
    * トークテーマを変える.API叩く.
